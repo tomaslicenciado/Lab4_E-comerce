@@ -5,7 +5,6 @@ class CategoriaProducto{
     - nombreCategoria: string
     - categoriaPadre: CategoriaProducto
     - cantidad: int
-    - productos: List<Producto>
 
 
     + Categoria()
@@ -23,7 +22,6 @@ class CategoriaProducto{
 class Proveedor{
     - idProveedor: int
     - nombreProveedor: string
-    - categorias: List<CategoriaProducto>
 
     + Proveedor(int id, String nombre)
     + setID(int)
@@ -38,9 +36,10 @@ class Producto{
     - idProducto: int
     - nombreProducto: string
     - categoria: CategoriaProducto
-    - proveedores: List<Proveedor>
-    - stock: List<StockProducto>
-    - precio: float
+    - proveedor: Proveedor
+    - precio_unitaro: float
+    - unidades_bulto : float
+    - costo_bulto: float
     - activo: bool
 
     + Producto()
@@ -127,8 +126,14 @@ class Detalle{
 
 class StockProducto{
     - proveedor: Proveedor
+    - costo_total: float
+    - fecha : Date
+}
+
+class DetalleStock{
+    - stock: StockProducto
     - producto: Producto
-    - stock: stock
+    - cantidad: float
 }
 
 class Venta{
@@ -149,12 +154,10 @@ class Venta{
     + getDireccion(): Direccion
 }
 
-Proveedor "0-n" --> "0-n" CategoriaProducto
-StockProducto -up-* Proveedor
+StockProducto "0-n" --left--* "1" Proveedor
 CategoriaProducto --> "1" CategoriaProducto
 Producto "0-n" -up-> "1" CategoriaProducto
-Producto "0-n" -up-> "1-n" Proveedor
-Producto "1" *-up-o "1-n " StockProducto
+Producto "0-n" -up-> "1" Proveedor
 CarroCompras "1" --> "0-n" Detalle
 Usuario "1" --* "1" CarroCompras
 Usuario "1" <-- "0-n" Venta
@@ -162,5 +165,7 @@ Usuario "1-n" -right-> "1-n" Direccion
 Detalle "1" -left-> "1" Producto
 Venta "1" --o "1-n" Detalle
 Direccion "1" --> Venta
+StockProducto "1" -down-> "0-n" DetalleStock
+DetalleStock "1" -down-> "1" Producto
 
 @enduml
