@@ -1,0 +1,166 @@
+@startuml Class Diagram
+
+class CategoriaProducto{
+    - idCategoria: int
+    - nombreCategoria: string
+    - categoriaPadre: CategoriaProducto
+    - cantidad: int
+    - productos: List<Producto>
+
+
+    + Categoria()
+    + setID(int)
+    + setNombre(String)
+    + setCantidad(int)
+    + agregarProducto(Producto producto)
+    + getID(): int
+    + getNombre(): String
+    + getCantidad(): int
+    + getProductos(): List<Productos>
+
+}
+
+class Proveedor{
+    - idProveedor: int
+    - nombreProveedor: string
+    - categorias: List<CategoriaProducto>
+
+    + Proveedor(int id, String nombre)
+    + setID(int)
+    + setNombreEntidad(Sting)
+    + getID(): int
+    + getNombreEntidad(): String
+
+
+}
+
+class Producto{
+    - idProducto: int
+    - nombreProducto: string
+    - categoria: CategoriaProducto
+    - proveedores: List<Proveedor>
+    - stock: List<StockProducto>
+    - precio: float
+    - activo: bool
+
+    + Producto()
+    + setID(int)
+    + setNombre(String)
+    + setStock(int)
+    + setPrecio(float)
+    + getID(): int
+    + getNombre(): String
+    + getSock(): int
+    + getPrecio(): float
+    + getCategoria(): Categoria
+    + getProveedor(): Proveedor
+}
+
+class CarroCompras{
+    - idCarro: int
+    - items: List<Detalle>
+    - estado:  string
+    - usuario: Usuario
+    - detalle: DetalleCarrito
+
+    + Carrito()
+    + setID(int)
+    + getUsuario(): Usuario
+    + getDetalle(): Detalle
+    + MostrarCarrito(DetalleCarrito)
+    + generarVenta(): Venta
+
+}
+
+class Usuario{
+    - idUsuario: int
+    - nombreUsuario: string
+    - mailUsuario: string
+    - carro: CarroCompras
+    - direcciones: List<Direccion>
+
+    + Usuario()
+    + setID(int)
+    + setNombreUsuario(String)
+    + setCorreo(String)
+    + getID(): int
+    + getNombreUsuario(): String
+    + getCorreo(): String
+    + agregarDireccion(Direccion direccion)
+    + getDirecciones(): List<Direccion>
+
+}
+class Direccion{
+    - provincia: String
+    - ciudad: String
+    - codigoPostal: int
+    - calle: String
+    - numero: int
+    - referencia: TextArea
+
+    + Direccion()
+    + setProvincia(String)
+    + setCiudad(String)
+    + setCP(int)
+    + setCalle(String)
+    + setNumero(int)
+    + setReferencia(TextArea)
+    + getProvincia():String
+    + getCiudad(): String
+    + getCP(): int
+    + getCalle(): String
+    + getNumero():int
+    + getReferencia(): TextArea
+
+
+}
+
+class Detalle{
+    - listado: List<Producto>
+    - cantidad: int
+    - subtotal: float
+
+    + DetalleCarrito()
+    + setCantidad(int)
+    + setSubtotal(float)
+}
+
+class StockProducto{
+    - proveedor: Proveedor
+    - producto: Producto
+    - stock: stock
+}
+
+class Venta{
+    - idVenta: int
+    - detalleVenta: List<Detalle>
+    - formaPago: int
+    - totalVenta: float
+    - comprador: Usuario
+    - direccion: Direccion
+    - costoEnvio: float
+
+    + actualizarStock()
+    + Venta()
+    + setCostoEnvio(float)
+    + calcularTotal(float)
+    + getUsuario(): Usuario
+    + getDetalle(): Detalle
+    + getDireccion(): Direccion
+}
+
+Proveedor "0-n" --> "0-n" CategoriaProducto
+StockProducto -up-* Proveedor
+CategoriaProducto --> "1" CategoriaProducto
+Producto "0-n" -up-> "1" CategoriaProducto
+Producto "0-n" -up-> "1-n" Proveedor
+Producto "1" *-up-o "1-n " StockProducto
+CarroCompras "1" --> "0-n" Detalle
+Usuario "1" --* "1" CarroCompras
+Usuario "1" <-- "0-n" Venta
+Usuario "1-n" -right-> "1-n" Direccion
+Detalle "1" -left-> "1" Producto
+Venta "1" --o "1-n" Detalle
+Direccion "1" --> Venta
+
+@enduml
