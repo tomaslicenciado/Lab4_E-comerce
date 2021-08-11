@@ -131,6 +131,7 @@ class DetalleCarro{
     - cantidad: int
     - subtotal: float
     - carro: CarroCompras
+    - estado : String
 
     + DetalleCarrito()
     + setCantidad(int)
@@ -152,7 +153,6 @@ class DetalleStock{
 
 class Venta{
     - idVenta: int
-    - detalleVenta: List<Detalle>
     - formaPago: int
     - totalVenta: float
     - comprador: Usuario
