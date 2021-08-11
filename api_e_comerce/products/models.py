@@ -33,8 +33,8 @@ class Product(models.Model):
     unit_per_package = models.FloatField('Unidades por bulto')
     package_price = models.FloatField('Costo por bulto')
     active = models.BooleanField('Activo', default=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, default=None)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, default=None)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True, default=None, verbose_name='Categoría')
+    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, blank=True, null=True, default=None, verbose_name='Proveedor')
 
     def __str__(self):
         return self.name
