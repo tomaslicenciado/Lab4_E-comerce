@@ -2,15 +2,13 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
-
+from rest_framework import viewsets
 from .models import Product
+from rest_framework.permissions import IsAuthenticated
+from .serializers import ProductSerializer
 
-# Create your views here.
 
-
-def ProductsView():
-    template_name = 'products/list.html'
-    context_object_name = 'product_list'
-
-    def query_set(self):
-        return Product.objects.order_by('name')
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = []

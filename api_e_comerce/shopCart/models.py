@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from products.models import Product
 # Create your models here.
-
+User = get_user_model()
 
 class ShopState(models.Model):
     name = models.CharField('Nombre', max_length=255)
@@ -31,18 +31,16 @@ class Address(models.Model):
         verbose_name_plural = 'Direcciones'
 
 
-class User(models.Model):
-    name = models.CharField('Nombre', max_length=255)
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+class UserProfile(models.Model):
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
     address = models.ForeignKey(Address, on_delete=models.DO_NOTHING, verbose_name='Dirección')
-    email = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return self.user
 
     class Meta:
-        verbose_name = 'Usuario'
-        verbose_name_plural = 'Usuarios'
+        verbose_name = 'Perfil'
+        verbose_name_plural = 'Perfiles'
 
 
 class ShopCart(models.Model):

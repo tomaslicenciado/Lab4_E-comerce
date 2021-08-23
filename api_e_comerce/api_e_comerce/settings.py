@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'products.apps.ProductsConfig',
     'shopCart.apps.ShopcartConfig',
     'sales.apps.SalesConfig',
-    'stocks.apps.StocksConfig'
+    'stocks.apps.StocksConfig',
+    'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +129,9 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
