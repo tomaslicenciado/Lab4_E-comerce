@@ -8,7 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import ProductSerializer
 
 
-class ProductViewSet(viewsets.ModelViewSet):
+class ProductsViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = []
+
