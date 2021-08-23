@@ -1,7 +1,16 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
+from django.views import generic
+
+from .models import Product
 
 # Create your views here.
 
-def index(request):
-    return render(request, 'index.html')
+
+def ProductsView():
+    template_name = 'products/list.html'
+    context_object_name = 'product_list'
+
+    def query_set(self):
+        return Product.objects.order_by('name')
