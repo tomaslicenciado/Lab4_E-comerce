@@ -1,5 +1,5 @@
 from django.db import models
-from shopCart.models import User, Address, ShopCartDetail
+from shopCart.models import User, ShopCartDetail
 from products.models import Product
 # Create your models here.
 
@@ -14,7 +14,6 @@ class Sale(models.Model):
     delivery_cost = models.FloatField('Costo de envío')
     total = models.FloatField('Total')
     client = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Cliente')
-    address = models.ForeignKey(Address, on_delete=models.DO_NOTHING, verbose_name='Dirección', default=None)
 
 
 class SaleDetail(models.Model):

@@ -14,26 +14,8 @@ class ShopState(models.Model):
         verbose_name = 'Estado de carro'
         verbose_name_plural = 'Estados de carro'
 
-
-class Address(models.Model):
-    street = models.CharField('Calle', max_length=255)
-    number = models.IntegerField('Número')
-    postalCode = models.IntegerField('Código postal')
-    city = models.CharField('Ciudad', max_length=255)
-    province = models.CharField('Provincia', max_length=255)
-    reference = models.TextField('Referencia')
-
-    def __str__(self):
-        return '{}, nº {} - {}'.format(self.street, self.number, self.province)
-
-    class Meta:
-        verbose_name = 'Dirección'
-        verbose_name_plural = 'Direcciones'
-
-
 class UserProfile(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
-    address = models.ForeignKey(Address, on_delete=models.DO_NOTHING, verbose_name='Dirección')
 
     def __str__(self):
         return self.user
