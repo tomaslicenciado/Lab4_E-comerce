@@ -57,3 +57,6 @@ Thumbs.db
 #SEVERALS
 _pycache_/
 *.py[cod]
+
+#Ignore virtual environments
+env/
