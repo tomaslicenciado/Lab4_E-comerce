@@ -13,3 +13,6 @@ class ProductsViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = []
 
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
