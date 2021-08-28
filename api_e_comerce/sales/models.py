@@ -20,5 +20,5 @@ class SaleDetail(models.Model):
     product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, verbose_name='Producto')
     quantity = models.FloatField('Cantidad')
     subtotal = models.FloatField('Sub total')
-    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, verbose_name='Venta')
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, verbose_name='Venta', related_name='detail')
     shop_cart_detail = models.ForeignKey(ShopCartDetail, on_delete=models.DO_NOTHING, verbose_name='Detalle de carro')
