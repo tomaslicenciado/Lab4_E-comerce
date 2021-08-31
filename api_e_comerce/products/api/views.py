@@ -10,6 +10,6 @@ class ProductModelViewSet(ModelViewSet):
 
     def get_queryset(self):
         if not self.request.user.is_staff:
-            return Product.objects.filter(active=True)
+            return Product.objects.filter(active=True, stock_unit__gt=0)
         else:
             return Product.objects.all()

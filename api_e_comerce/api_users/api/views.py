@@ -20,7 +20,7 @@ class UserRegisterModelViewSet(ModelViewSet):
         user = serializer.save()
         user.set_password(serializer.initial_data['password'])
         retSerializer = UserSerializer(user)
-        return Response(status=status.HTTP_201_CREATED, data = retSerializer.data)
+        return Response(status=status.HTTP_201_CREATED, data=retSerializer.data)
 
 
 
@@ -37,5 +37,5 @@ class UserChangeAttrModelViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         saved_user = serializer.save()
         retSerializer = UserSerializer(saved_user)
-        return Response(status = status.HTTP_200_OK, data=retSerializer.data)
+        return Response(status=status.HTTP_200_OK, data=retSerializer.data)
 

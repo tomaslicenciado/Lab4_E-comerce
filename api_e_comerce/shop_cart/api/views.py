@@ -1,9 +1,10 @@
+from django.db.models import Prefetch
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from .permissions import IsAuthenticatedOrAdminReadOnly
 from rest_framework.permissions import IsAuthenticated
-from shop_cart.models import ShopCart, ShopCartDetail
+from shop_cart.models import ShopCart, ShopCartDetail, ShopDetailState
 from .serializers import ShopCartSerializer, ShopCartDetailSerializer
 
 
@@ -23,7 +24,8 @@ class ShopCartModelViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            cart = ShopCart.objects.filter(user=request.user)
+            state = ShopDetailState.objects.get(pk=1)
+            cart = ShopCart.objects.filter(user=request.user).prefetch_related(Prefetch('details',queryset=ShopCartDetail.objects.filter(state=state)))
             if cart:
                 serializer = ShopCartSerializer(cart, many=True)
                 return Response(status=status.HTTP_200_OK, data=serializer.data)
@@ -34,7 +36,7 @@ class ShopCartModelViewSet(ModelViewSet):
             return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
-class AddProdShopCartModelViewSet(ModelViewSet):
+class ProdShopCartModelViewSet(ModelViewSet):
     serializer_class = ShopCartDetailSerializer
     queryset = ShopCartDetail.objects.all()
     permission_classes = [IsAuthenticatedOrAdminReadOnly]
@@ -48,3 +50,9 @@ class AddProdShopCartModelViewSet(ModelViewSet):
         else:
             serializer.save()
             return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.state = ShopDetailState.objects.get(pk=3)
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
