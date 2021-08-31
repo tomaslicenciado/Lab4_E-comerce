@@ -18,16 +18,11 @@ class UserChangeAttrSerializer(ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'password']
+        fields = ['username', 'first_name', 'last_name']
 
-    def update(self, instance, validated_data):
-        
-        if validated_data['username'] is not None:
-            instance.username = validated_data['username']
-        if validated_data['first_name'] is not None:
-            instance.first_name = validated_data['first_name']
-        if validated_data['last_name'] is not None:
-            instance.last_name = validated_data['last_name']
-        if validated_data['password'] is not None:
-            instance.password = make_password(validated_data['password'])
-        instance.save()
+
+class UserChangePasswordSerializer(ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ['password']
