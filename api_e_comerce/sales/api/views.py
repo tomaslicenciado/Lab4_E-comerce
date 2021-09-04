@@ -5,6 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from .permissions import IsAuthenticatedOrAdminReadOnly
 from sales.models import Sale, SaleDetail, PayMethod
 from .serializer import SaleSerializer, SaleDetailSerializer
+from shop_cart.api.serializers import ShopCartSerializer, ShopCartDetailSerializer
 
 
 class SaleModelViewSet(ModelViewSet):
@@ -18,16 +19,14 @@ class SaleModelViewSet(ModelViewSet):
             return Sale.objects.all()
 
     def create(self, request, *args, **kwargs):
-        serializer = SaleSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if self.request.user == serializer.validated_data['user']:
-            serializer.save()
-            return Response(status=status.HTTP_200_OK, data=serializer.data)
-        else:
-            return Response({"error":"El usuario no tiene permiso para crear una venta en esta cuenta"})
+        cart_serializer = ShopCartSerializer(data=request.data)
+        cart_serializer.is_valid(raise_exception=True)
+        cart_details_serializer = cart_serializer.validated_data['details']
+        cart_details_serializer.is_valid(raise_exception=True)
+        # if self.request.user == serializer.validated_data['user']:
+        #     serializer.save()
+        #     return Response(status=status.HTTP_200_OK, data=serializer.data)
+        # else:
+        #     return Response({"error":"El usuario no tiene permiso para crear una venta en esta cuenta"})
 
 
-class SaleDetailModelViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticatedOrAdminReadOnly]
-    serializer_class = SaleDetailSerializer
-    queryset = SaleDetail.objects.all()
