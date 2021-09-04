@@ -46,9 +46,19 @@ class ShopCartDetail(models.Model):
     state = models.ForeignKey(ShopDetailState, on_delete=models.DO_NOTHING, verbose_name='Estado')
 
     def save(self, *args, **kwargs):
-        cart = ShopCart.objects.get(pk=self.shopcart.id)
-        cart.subtotal = cart.subtotal + self.subtotal
-        cart.save()
+        if not self.id:
+            cart = ShopCart.objects.get(pk=self.shopcart.id)
+            cart.subtotal = cart.subtotal + self.subtotal
+            cart.save()
+        else:
+            bd_state = ShopCartDetail.objects.get(pk=self.id).state
+            if not self.state == bd_state:
+                cart = ShopCart.objects.get(pk=self.shopcart.id)
+                if self.state == ShopDetailState.objects.get(pk=1):
+                    cart.subtotal = cart.subtotal + self.subtotal
+                else:
+                    cart.subtotal = cart.subtotal - self.subtotal
+                cart.save()
         super().save(*args, **kwargs)
 
     def __str__(self):

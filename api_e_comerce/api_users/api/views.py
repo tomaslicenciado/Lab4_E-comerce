@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from rest_framework.response import Response
-from rest_framework.viewsets import  ModelViewSet
+from rest_framework.viewsets import ModelViewSet
 import rest_framework.status as status
 from .serializers import UserRegisterSerializer, UserSerializer, UserChangeAttrSerializer, UserChangePasswordSerializer
 from api_users.models import User
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth.hashers import make_password
+
 
 class UserRegisterModelViewSet(ModelViewSet):
     serializer_class = UserRegisterSerializer
