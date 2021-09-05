@@ -10,9 +10,9 @@ class PayMethod(models.Model):
 
 class Sale(models.Model):
     pay_method = models.ForeignKey(PayMethod, on_delete=models.DO_NOTHING, default=None, verbose_name='Forma de pago')
-    subtotal = models.FloatField('Sub total')
-    delivery_cost = models.FloatField('Costo de envío')
-    total = models.FloatField('Total')
+    subtotal = models.FloatField('Sub total', default=0)
+    delivery_cost = models.FloatField('Costo de envío', default=0)
+    total = models.FloatField('Total', default=0)
     client = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Cliente')
 
 
