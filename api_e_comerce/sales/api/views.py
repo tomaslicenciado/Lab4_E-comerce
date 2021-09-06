@@ -24,18 +24,22 @@ class SaleModelViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         state = ShopDetailState.objects.get(pk=1)
-        cart = ShopCart.objects.filter(user=request.user).prefetch_related(Prefetch('details', queryset=ShopCartDetail.objects.filter(state=state)))
-
-        cart_serializer = ShopCartSerializer(ShopCart.objects.get(user=self.request.user))
-        cart_detail_serializer = ShopCartDetailSerializer(data=cart_serializer.data["details"], many=True)
-        cart_detail_serializer.is_valid(raise_exception=True)
-        # if cart_detail_serializer.
-        sale = Sale(pay_method=PayMethod.objects.get(id=self.request.data["pm"]), client=self.request.user, delivery_cost=self.request.data["delivery_cost"])
-        sale.save()
-        for sd in cart_detail_serializer.initial_data:
-            prod = Product.objects.get(pk=sd["product"])
-            if prod.stock_unit >= sd["quantity"] and sd["state"] == 1:
-                saleDet = SaleDetail(product=prod, quantity=sd["quantity"], subtotal=sd["subtotal"], sale=sale, shop_cart_detail=ShopCartDetail.objects.get(pk=sd["id"]))
-                saleDet.save()
-        saleserializer = SaleSerializer(sale)
-        return Response(data=saleserializer.data, status=status.HTTP_200_OK)
+        cart = ShopCart.objects.get(user=request.user)
+        cart_elem = ShopCartDetail.objects.filter(shopcart=cart, state=state)
+        if cart_elem:
+            cart_serializer = ShopCartSerializer(cart)
+            cart_detail_serializer = ShopCartDetailSerializer(data=cart_serializer.data["details"], many=True)
+            cart_detail_serializer.is_valid(raise_exception=True)
+            # if cart_detail_serializer.
+            sale = Sale(pay_method=PayMethod.objects.get(id=self.request.data["pm"]), client=self.request.user, delivery_cost=self.request.data["delivery_cost"])
+            sale.save()
+            for sd in cart_detail_serializer.initial_data:
+                prod = Product.objects.get(pk=sd["product"])
+                if prod.stock_unit >= sd["quantity"] and sd["state"] == 1:
+                    saleDet = SaleDetail(product=prod, quantity=sd["quantity"], subtotal=sd["subtotal"], sale=sale, shop_cart_detail=ShopCartDetail.objects.get(pk=sd["id"]))
+                    saleDet.save()
+            sale = Sale.objects.get(pk=sale.id)
+            saleserializer = SaleSerializer(sale)
+            return Response(data=saleserializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error":"El carro de compras está vacío"})

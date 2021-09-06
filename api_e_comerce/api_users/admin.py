@@ -7,5 +7,6 @@ from .models import User
 class UserAdmin(UA):
     # fieldsets = (
     #     ('Dirección', {'fields': ('address',)}),
+    #     'id'
     # )
     pass
