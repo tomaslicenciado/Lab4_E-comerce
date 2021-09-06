@@ -47,6 +47,10 @@ class ProdShopCartModelViewSet(ModelViewSet):
         cart = serializer.validated_data['shopcart']
         if self.request.user != cart.user:
             return Response({"error":"El usuario no tiene permiso para modificar el carrito de otro usuario"})
+        elif not serializer.validated_data['product'].active:
+            return Response({"error":"No se puede agregar un producto inactivo"})
+        elif serializer.validated_data['product'].stock_unit < serializer.validated_data['quantity']:
+            return Response({"error":"No hay suficientes unidades del producto para agregar al carro"})
         else:
             serializer.save()
             return Response(status=status.HTTP_200_OK, data=serializer.data)

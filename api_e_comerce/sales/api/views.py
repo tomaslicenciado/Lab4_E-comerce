@@ -23,17 +23,19 @@ class SaleModelViewSet(ModelViewSet):
             return Sale.objects.all()
 
     def create(self, request, *args, **kwargs):
+        state = ShopDetailState.objects.get(pk=1)
+        cart = ShopCart.objects.filter(user=request.user).prefetch_related(Prefetch('details', queryset=ShopCartDetail.objects.filter(state=state)))
+
         cart_serializer = ShopCartSerializer(ShopCart.objects.get(user=self.request.user))
         cart_detail_serializer = ShopCartDetailSerializer(data=cart_serializer.data["details"], many=True)
         cart_detail_serializer.is_valid(raise_exception=True)
-        sale = Sale(pay_method=PayMethod.objects.get(id=self.request.data["pm"]), client=self.request.user, subtotal=cart_serializer.data["subtotal"], delivery_cost=self.request.data["delivery_cost"])
-        detailist = []
-        for sd in cart_detail_serializer.validated_data:
-            prod = ProductSerializer(sd["product"])
-            if prod.data["stock_unit"] >= sd["quantity"] and sd["state"] == ShopDetailState.objects.get(pk=1):
-                detailist.append(SaleDetail(product=sd["product"], quantity=sd["quantity"], subtotal=sd["subtotal"], sale=sale, shop_cart_detail=ShopCartDetail.objects.get(pk=sd["id"])))
-                prod["stock_unit"] = prod["stock_unit"] - sd["quantity"]
-                prod.save()
+        # if cart_detail_serializer.
+        sale = Sale(pay_method=PayMethod.objects.get(id=self.request.data["pm"]), client=self.request.user, delivery_cost=self.request.data["delivery_cost"])
+        sale.save()
+        for sd in cart_detail_serializer.initial_data:
+            prod = Product.objects.get(pk=sd["product"])
+            if prod.stock_unit >= sd["quantity"] and sd["state"] == 1:
+                saleDet = SaleDetail(product=prod, quantity=sd["quantity"], subtotal=sd["subtotal"], sale=sale, shop_cart_detail=ShopCartDetail.objects.get(pk=sd["id"]))
+                saleDet.save()
         saleserializer = SaleSerializer(sale)
-        saleserializer.save()
         return Response(data=saleserializer.data, status=status.HTTP_200_OK)
