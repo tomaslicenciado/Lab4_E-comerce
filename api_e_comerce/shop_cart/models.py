@@ -3,21 +3,9 @@ from api_users.models import User
 from products.models import Product
 
 
-class ShopState(models.Model):
-    name = models.CharField('Nombre', max_length=255)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Estado de carro'
-        verbose_name_plural = 'Estados de carro'
-
-
 class ShopCart(models.Model):
     subtotal = models.FloatField('Sub total')
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuario')
-    state = models.ForeignKey(ShopState, on_delete=models.DO_NOTHING, verbose_name='Estado', default=None)
 
     def __str__(self):
         return 'Carro de compras de {}'.format(self.user)
@@ -27,38 +15,34 @@ class ShopCart(models.Model):
         verbose_name_plural = 'Carros de compras'
 
 
-class ShopDetailState(models.Model):
-    name = models.CharField('Nombre', max_length=255)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Estado de detalle de carro'
-        verbose_name_plural = 'Estados de detalle de carro'
-
-
 class ShopCartDetail(models.Model):
+    OPEN = 1
+    SELL = 2
+    CANCELED = 3
+    STATES = ((OPEN, "En carro"),
+              (SELL, "Vendido"),
+              (CANCELED, "Cancelado"),)
+
     product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, verbose_name='Producto')
     quantity = models.FloatField('Cantidad')
     subtotal = models.FloatField('Sub total')
-    shopcart = models.ForeignKey(ShopCart, on_delete=models.CASCADE, verbose_name='Carro de compras', related_name='details')
-    state = models.ForeignKey(ShopDetailState, on_delete=models.DO_NOTHING, verbose_name='Estado')
+    shopcart = models.ForeignKey(ShopCart, on_delete=models.CASCADE, verbose_name='Carro de compras',
+                                 related_name='details', default=0)
+    state = models.SmallIntegerField("Estado", default=OPEN, choices=STATES)
 
     def save(self, *args, **kwargs):
+        self.subtotal = self.product.unit_price * self.quantity
         if not self.id:
-            cart = ShopCart.objects.get(pk=self.shopcart.id)
-            cart.subtotal = cart.subtotal + self.subtotal
-            cart.save()
+            self.shopcart.subtotal += self.subtotal
+            self.shopcart.save()
         else:
             bd_state = ShopCartDetail.objects.get(pk=self.id).state
             if not self.state == bd_state:
-                cart = ShopCart.objects.get(pk=self.shopcart.id)
-                if self.state == ShopDetailState.objects.get(pk=1):
-                    cart.subtotal = cart.subtotal + self.subtotal
+                if self.state == self.OPEN:
+                    self.shopcart.subtotal += self.subtotal
                 else:
-                    cart.subtotal = cart.subtotal - self.subtotal
-                cart.save()
+                    self.shopcart.subtotal -= self.subtotal
+                self.shopcart.save()
         super().save(*args, **kwargs)
 
     def __str__(self):

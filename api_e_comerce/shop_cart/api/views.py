@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from .permissions import IsAuthenticatedOrAdminReadOnly
 from rest_framework.permissions import IsAuthenticated
-from shop_cart.models import ShopCart, ShopCartDetail, ShopDetailState
+from shop_cart.models import ShopCart, ShopCartDetail
 from .serializers import ShopCartSerializer, ShopCartDetailSerializer
 
 
@@ -24,8 +24,7 @@ class ShopCartModelViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            state = ShopDetailState.objects.get(pk=1)
-            cart = ShopCart.objects.filter(user=request.user).prefetch_related(Prefetch('details',queryset=ShopCartDetail.objects.filter(state=state)))
+            cart = ShopCart.objects.filter(user=request.user).prefetch_related(Prefetch('details',queryset=ShopCartDetail.objects.filter(state=ShopCartDetail.OPEN)))
             if cart:
                 serializer = ShopCartSerializer(cart, many=True)
                 return Response(status=status.HTTP_200_OK, data=serializer.data)
@@ -57,6 +56,6 @@ class ProdShopCartModelViewSet(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.state = ShopDetailState.objects.get(pk=3)
+        instance.state = ShopCartDetail.CANCELLED
         instance.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
