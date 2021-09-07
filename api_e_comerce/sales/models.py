@@ -1,5 +1,5 @@
 from django.db import models
-from shop_cart.models import ShopCartDetail, ShopDetailState
+from shop_cart.models import ShopCartDetail
 from products.models import Product
 from api_users.models import User
 
@@ -22,20 +22,14 @@ class Sale(models.Model):
 
 
 class SaleDetail(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, verbose_name='Producto')
-    quantity = models.FloatField('Cantidad')
-    subtotal = models.FloatField('Sub total')
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE, verbose_name='Venta', related_name='detail')
     shop_cart_detail = models.ForeignKey(ShopCartDetail, on_delete=models.DO_NOTHING, verbose_name='Detalle de carro')
 
     def save(self, *args, **kwargs):
-        product = Product.objects.get(pk=self.product.id)
-        product.stock_unit -= self.quantity
-        product.save()
-        sale = Sale.objects.get(pk=self.sale.id)
-        sale.subtotal += self.subtotal
-        sale.save()
-        shop_detail = ShopCartDetail.objects.get(pk=self.shop_cart_detail.id)
-        shop_detail.state = ShopDetailState.objects.get(pk=2)
-        shop_detail.save()
+        self.shop_cart_detail.product.stock_unit -= self.quantity
+        self.shop_cart_detail.product.save()
+        self.sale.subtotal += self.subtotal
+        self.sale.save()
+        self.shop_cart_detail.state = ShopDetailState.SELL
+        self.shop_cart_detail.save()
         super().save(*args, **kwargs)
