@@ -32,8 +32,8 @@ class SaleModelViewSet(ModelViewSet):
             for sd in cart_detail_serializer.initial_data:
                 prod = Product.objects.get(pk=sd["product"])
                 if prod.stock_unit >= sd["quantity"] and sd["state"] == 1:
-                    saleDet = SaleDetail(product=prod, quantity=sd["quantity"], subtotal=sd["subtotal"], sale=sale, shop_cart_detail=ShopCartDetail.objects.get(pk=sd["id"]))
-                    saleDet.save()
+                    sale_det = SaleDetail(sale=sale, shop_cart_detail=ShopCartDetail.objects.get(pk=sd["id"]))
+                    sale_det.save()
             sale = Sale.objects.get(pk=sale.id)
             saleserializer = SaleSerializer(sale)
             return Response(data=saleserializer.data, status=status.HTTP_200_OK)

@@ -26,10 +26,10 @@ class SaleDetail(models.Model):
     shop_cart_detail = models.ForeignKey(ShopCartDetail, on_delete=models.DO_NOTHING, verbose_name='Detalle de carro')
 
     def save(self, *args, **kwargs):
-        self.shop_cart_detail.product.stock_unit -= self.quantity
+        self.shop_cart_detail.product.stock_unit -= self.shop_cart_detail.quantity
         self.shop_cart_detail.product.save()
-        self.sale.subtotal += self.subtotal
+        self.sale.subtotal += self.shop_cart_detail.subtotal
         self.sale.save()
-        self.shop_cart_detail.state = ShopDetailState.SELL
+        self.shop_cart_detail.state = ShopCartDetail.SELL
         self.shop_cart_detail.save()
         super().save(*args, **kwargs)
