@@ -6,6 +6,7 @@ from .serializers import UserRegisterSerializer, UserSerializer, UserChangeAttrS
 from api_users.models import User
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth.hashers import make_password
+from shop_cart.models import ShopCart
 
 
 class UserRegisterModelViewSet(ModelViewSet):
@@ -20,6 +21,7 @@ class UserRegisterModelViewSet(ModelViewSet):
         serializer.validated_data['password']=make_password(password)
         user = serializer.save()
         user.set_password(serializer.initial_data['password'])
+        shop_cart = ShopCart.objects.create(user=user)
         retSerializer = UserSerializer(user)
         return Response(status=status.HTTP_201_CREATED, data=retSerializer.data)
 

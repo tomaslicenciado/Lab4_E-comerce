@@ -4,7 +4,7 @@ from products.models import Product
 
 
 class ShopCart(models.Model):
-    subtotal = models.FloatField('Sub total')
+    subtotal = models.FloatField('Sub total', default=0)
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuario')
 
     def __str__(self):

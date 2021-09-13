@@ -13,15 +13,7 @@ class ShopCartModelViewSet(ModelViewSet):
     serializer_class = ShopCartSerializer
     queryset = ShopCart.objects.all()
     permission_classes = [IsAuthenticatedOrAdminReadOnly]
-
-    def create(self, request, *args, **kwargs):
-        serializer = ShopCartSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if self.request.user == serializer.validated_data['user'] or self.request.user.is_staff:
-            serializer.save()
-            return Response(status=status.HTTP_200_OK, data=request.data)
-        else:
-            return Response({"error":"El usuario no tiene permiso para crear el carro de otro usuario"})
+    http_method_names = ['list']
 
     def list(self, request, *args, **kwargs):
         if not request.user.is_staff:
