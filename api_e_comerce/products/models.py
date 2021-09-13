@@ -27,8 +27,8 @@ class Supplier(models.Model):
 
 class Product(models.Model):
     name = models.CharField('Nombre', max_length=255)
-    unit_price = models.FloatField('Precio Unitario')
-    unit_per_package = models.IntegerField('Unidades por bulto')
+    unit_price = models.FloatField('Precio Unitario', default=0)
+    unit_per_package = models.IntegerField('Unidades por bulto', default=1)
     package_price = models.FloatField('Costo por bulto')
     active = models.BooleanField('Activo', default=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True, default=None, verbose_name='Categoría')

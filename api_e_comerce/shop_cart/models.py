@@ -24,7 +24,7 @@ class ShopCartDetail(models.Model):
               (CANCELED, "Cancelado"),)
 
     product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, verbose_name='Producto')
-    quantity = models.FloatField('Cantidad')
+    quantity = models.FloatField('Cantidad', default=0)
     subtotal = models.FloatField('Sub total', default=0)
     shopcart = models.ForeignKey(ShopCart, on_delete=models.CASCADE, verbose_name='Carro de compras',
                                  related_name='details', default=0)

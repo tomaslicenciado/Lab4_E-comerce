@@ -28,14 +28,12 @@ class UserTest(TestCase):
                                             unit_per_package=6,
                                             package_price=130 * 6,
                                             stock_unit=10)
-        # self.cart_detail = ShopCartDetail.objects.create(product=self.prod1,
-        #                                                  quantity=2,
-        #                                                  shopcart=self.shop_cart)
         response = self.browser.post('/api/auth/login/', {'email': 'tom@admin.api', 'password': 'tom12345'})
         rj = json.loads(response.content)
         self.browser.defaults['HTTP_AUTHORIZATION'] = 'Bearer {}'.format(rj.get('access'))
-        # cart_detail = dict(product=1,
-        #                    quantity=3)
-        rsp = self.browser.post(reverse('prodCart-list'), {"product": 1, "quantity": 1})
+        cart_detail = dict(product=1,
+                           quantity=2)
+        rsp = self.browser.post(reverse('prodCart-list'), json.dumps(cart_detail), content_type="application/json")
         self.assertEqual(rsp.status_code, 201)
+        self.shop_cart = ShopCart.objects.get(user=User.objects.last())
         self.assertEqual(self.shop_cart.subtotal, 300)

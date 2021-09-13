@@ -32,10 +32,40 @@ class SaleModelViewSet(ModelViewSet):
             for sd in cart_detail_serializer.initial_data:
                 prod = Product.objects.get(pk=sd["product"])
                 if prod.stock_unit >= sd["quantity"] and sd["state"] == 1:
-                    sale_det = SaleDetail(sale=sale, shop_cart_detail=ShopCartDetail.objects.get(pk=sd["id"]))
+                    sale_det = SaleDetail(sale=sale,
+                                          shop_cart_detail=ShopCartDetail.objects.get(pk=sd["id"]))
                     sale_det.save()
             sale = Sale.objects.get(pk=sale.id)
             saleserializer = SaleSerializer(sale)
-            return Response(data=saleserializer.data, status=status.HTTP_200_OK)
+            return Response(data=saleserializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response({"error":"El carro de compras está vacío"})
+
+
+class DirectSaleModelViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SaleSerializer
+    http_method_names = ['post']
+
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            return Sale.objects.filter(user=self.request.user)
+        else:
+            return Sale.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        cart = ShopCart.objects.get(user=request.user)
+        sale = Sale.objects.create(pay_method=PayMethod.objects.get(id=self.request.data["pm"]),
+                                   client=self.request.user,
+                                   delivery_cost=self.request.data["delivery_cost"])
+        shop_cart_det = ShopCartDetail(product=Product.objects.get(pk=self.request.data["product"]),
+                                                      quantity=self.request.data["quantity"],
+                                                      shopcart=cart,
+                                                      state=ShopCartDetail.SELL)
+        shop_cart_det.save()
+        sale_det = SaleDetail(sale=sale,
+                              shop_cart_detail=shop_cart_det)
+        sale_det.save()
+        sale = Sale.objects.get(pk=sale.id)
+        saleserializer = SaleSerializer(sale)
+        return Response(data=saleserializer.data, status=status.HTTP_201_CREATED)
