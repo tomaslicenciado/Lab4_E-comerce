@@ -35,7 +35,6 @@ class ProdShopCartModelViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrAdminReadOnly]
 
     def create(self, request, *args, **kwargs):
-        print(self.request.data)
         cart_detail = ShopCartDetail.objects.create(product=Product.objects.get(pk=self.request.data["product"]),
                                                     quantity=self.request.data["quantity"],
                                                     shopcart=ShopCart.objects.get(user=self.request.user))
@@ -50,6 +49,6 @@ class ProdShopCartModelViewSet(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.state = ShopCartDetail.CANCELLED
+        instance.state = ShopCartDetail.CANCELED
         instance.save()
         return Response(status=status.HTTP_204_NO_CONTENT)

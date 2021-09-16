@@ -36,7 +36,6 @@ class UserChangeAttrModelViewSet(ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         user = User.objects.get(pk=request.user.pk)
-        print(user)
         serializer = UserChangeAttrSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         saved_user = serializer.save()
@@ -53,7 +52,6 @@ class UserChangePasswordModelViewSet(ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         user = User.objects.get(pk=request.user.pk)
-        print(user)
         serializer = UserChangePasswordSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         password = serializer.validated_data.get('password')

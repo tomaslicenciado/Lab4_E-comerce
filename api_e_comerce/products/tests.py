@@ -81,3 +81,4 @@ class ProductTest(TestCase):
         last = Product.objects.last()
         response = self.browser.delete(reverse('products-detail', args=[last.pk]))
         cnt = Product.objects.count()
+        self.assertEqual(cnt, 2)
