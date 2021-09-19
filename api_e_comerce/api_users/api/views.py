@@ -28,7 +28,6 @@ class UserRegisterModelViewSet(ModelViewSet):
 
 
 class UserChangeAttrModelViewSet(ModelViewSet):
-    ## TODO
     serializer_class = UserChangeAttrSerializer
     queryset = []
     permission_classes = [IsAuthenticated, ]
@@ -44,7 +43,6 @@ class UserChangeAttrModelViewSet(ModelViewSet):
 
 
 class UserChangePasswordModelViewSet(ModelViewSet):
-    ## TODO
     serializer_class = UserChangePasswordSerializer
     queryset = []
     permission_classes = [IsAuthenticated, ]

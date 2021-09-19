@@ -1,7 +1,9 @@
+
 from django.test import TestCase, Client
 import json
 
 from django.urls import reverse
+from rest_framework import response
 
 from .models import Product
 from api_users.models import User
@@ -82,3 +84,35 @@ class ProductTest(TestCase):
         response = self.browser.delete(reverse('products-detail', args=[last.pk]))
         cnt = Product.objects.count()
         self.assertEqual(cnt, 2)
+
+    def test_api_stock(self):
+        addDict = dict(
+            isAdd="True",
+            quantity= "5"
+        )
+        response = self.browser.patch(reverse('setAddStock-detail', args=[100]), data=json.dumps(addDict), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_api_add_stock(self):
+        
+        addDict = dict(
+            isAdd="True",
+            quantity= "5"
+        )
+
+        sUnits = Product.objects.get(pk=1).stock_unit
+        response = self.browser.patch(reverse('setAddStock-detail', args=[1]), data=json.dumps(addDict), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        prod = Product.objects.get(pk=1)
+        self.assertEqual(prod.stock_unit, sUnits+5)
+    
+    def test_api_set_stock(self):
+        addDict = dict(
+            isAdd="False",
+            quantity= "5"
+        )
+
+        response = self.browser.patch(reverse('setAddStock-detail', args=[1]), data=json.dumps(addDict), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        prod = Product.objects.get(pk=1)
+        self.assertEqual(prod.stock_unit, 5)
