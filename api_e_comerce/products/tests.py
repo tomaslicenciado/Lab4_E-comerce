@@ -35,6 +35,12 @@ class ProductTest(TestCase):
                                             unit_per_package=6,
                                             package_price=150 * 6,
                                             stock_unit=20)
+        self.prod3 = Product.objects.create(name='Inactivo',
+                                            unit_price=170,
+                                            unit_per_package=6,
+                                            package_price=150 * 6,
+                                            stock_unit=20,
+                                            active=False)
 
         self.cart_detail = ShopCartDetail.objects.create(product=self.prod1,
                                                          quantity=2,
@@ -46,7 +52,7 @@ class ProductTest(TestCase):
 
     def test_create_product(self):
         cnt = Product.objects.count()
-        self.assertEqual(cnt, 2)
+        self.assertEqual(cnt, 3)
         mirinda = Product.objects.get(name='Mirinda')
         self.assertEqual(mirinda.stock_unit, 10)
 
@@ -66,7 +72,7 @@ class ProductTest(TestCase):
         products = self.browser.get(reverse('products-list'))
         self.assertEqual(products.status_code, 200)
         content = json.loads(products.content)
-        self.assertEqual(len(content), 2)
+        self.assertEqual(len(content), 3)
         self.assertIsNotNone(content[0].get("name"))
         self.assertIsNone(content[0].get("cualquierotracosa"))
 
@@ -79,40 +85,30 @@ class ProductTest(TestCase):
         response = self.browser.post(reverse('products-list'), saladix)
         self.assertEqual(response.status_code, 201)
         cnt = Product.objects.count()
-        self.assertEqual(cnt, 3)
+        self.assertEqual(cnt, 4)
         last = Product.objects.last()
         response = self.browser.delete(reverse('products-detail', args=[last.pk]))
         cnt = Product.objects.count()
-        self.assertEqual(cnt, 2)
+        self.assertEqual(cnt, 3)
 
     def test_api_stock(self):
-        addDict = dict(
-            isAdd="True",
-            quantity= "5"
-        )
-        response = self.browser.patch(reverse('setAddStock-detail', args=[100]), data=json.dumps(addDict), content_type='application/json')
+        page = reverse('setAddStock-list')
+        prod1 = [dict(id=1, stock_unit=15), ]
+        prod2 = [dict(id=1, stock_unit=-1), ]
+        prod3 = [dict(id=1, stock_unit=15), dict(id=2, stock_unit=25)]
+        prod4 = [dict(id=1, stock_unit=15), dict(id=3, stock_unit=15)]
+        prod5 = [dict(id=1, stock_unit=15), dict(id=20, stock_unit=15)]
+        response = self.browser.post(page, json.dumps(prod1), content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        self.prod1 = Product.objects.get(pk=self.prod1.pk)
+        self.assertEqual(self.prod1.stock_unit, 15)
+        response = self.browser.post(page, json.dumps(prod2), content_type="application/json")
         self.assertEqual(response.status_code, 400)
-
-    def test_api_add_stock(self):
-        
-        addDict = dict(
-            isAdd="True",
-            quantity= "5"
-        )
-
-        sUnits = Product.objects.get(pk=1).stock_unit
-        response = self.browser.patch(reverse('setAddStock-detail', args=[1]), data=json.dumps(addDict), content_type='application/json')
+        response = self.browser.post(page, json.dumps(prod3), content_type="application/json")
         self.assertEqual(response.status_code, 200)
-        prod = Product.objects.get(pk=1)
-        self.assertEqual(prod.stock_unit, sUnits+5)
-    
-    def test_api_set_stock(self):
-        addDict = dict(
-            isAdd="False",
-            quantity= "5"
-        )
-
-        response = self.browser.patch(reverse('setAddStock-detail', args=[1]), data=json.dumps(addDict), content_type='application/json')
-        self.assertEqual(response.status_code, 200)
-        prod = Product.objects.get(pk=1)
-        self.assertEqual(prod.stock_unit, 5)
+        self.prod2 = Product.objects.get(pk=self.prod2.pk)
+        self.assertEqual(self.prod2.stock_unit, 25)
+        response = self.browser.post(page, json.dumps(prod4), content_type="application/json")
+        self.assertEqual(response.status_code, 406)
+        response = self.browser.post(page, json.dumps(prod5), content_type="application/json")
+        self.assertEqual(response.status_code, 404)

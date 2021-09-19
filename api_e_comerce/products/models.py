@@ -38,6 +38,12 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def get_or_none(**kwargs):
+        try:
+            return Product.objects.get(**kwargs)
+        except Product.DoesNotExist:
+            return None
+
     class Meta:
         verbose_name = 'Producto'
         verbose_name_plural = 'Productos'

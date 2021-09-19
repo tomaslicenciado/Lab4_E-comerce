@@ -13,7 +13,7 @@ class ShopCartModelViewSet(ModelViewSet):
     serializer_class = ShopCartSerializer
     queryset = ShopCart.objects.all()
     permission_classes = [IsAuthenticatedOrAdminReadOnly]
-    http_method_names = ['list']
+    http_method_names = ['get']
 
     def list(self, request, *args, **kwargs):
         if not request.user.is_staff:
@@ -35,7 +35,10 @@ class ProdShopCartModelViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrAdminReadOnly]
 
     def create(self, request, *args, **kwargs):
-        cart_detail = ShopCartDetail.objects.create(product=Product.objects.get(pk=self.request.data["product"]),
+        product = Product.get_or_none(pk=self.request.data["product"])
+        if not product:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="{error: 'Id de producto ingresado no valido'}")
+        cart_detail = ShopCartDetail.objects.create(product=product,
                                                     quantity=self.request.data["quantity"],
                                                     shopcart=ShopCart.objects.get(user=self.request.user))
         if not cart_detail.product.active:

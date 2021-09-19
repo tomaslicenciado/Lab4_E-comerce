@@ -8,7 +8,7 @@ class ProductSerializer(ModelSerializer):
         model = Product
         fields = '__all__'
 
-class StockSetterSerializer(Serializer):
-    def __init__(self, quantity=None, isAdd=None):
-        self.quantity = int(quantity) 
-        self.isAdd = isAdd == "True"
+class StockSetterSerializer(ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'stock_unit']
