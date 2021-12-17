@@ -2,7 +2,7 @@
 
 Trabajo práctico para materia de Laboratorio, Universidad Blas Pascal.
 
-Grupo 2
+Grupo 2: Tomas Ferreyra, Matias Cermak
 
 Api para e-commerce en Django con Python
 
